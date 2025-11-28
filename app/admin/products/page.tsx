@@ -1,3 +1,4 @@
+"use client";
 import { ProductTable } from "@/components/admin/products/ProductTable";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
