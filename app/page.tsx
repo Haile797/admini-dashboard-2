@@ -1,8 +1,14 @@
-export default function HomePage() {
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Welcome to Mini Admin Dashboard</h1>
-      <p>Please login to access the admin panel.</p>
-    </div>
-  );
+// app/page.tsx
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+export default async function HomePage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/auth/login");
+  }
+
+  redirect("/admin/dashboard");
 }

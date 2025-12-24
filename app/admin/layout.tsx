@@ -1,5 +1,4 @@
-// app/admin/layout.tsx
-"use client"; // DÒNG NÀY LÀM NÓ THÀNH CLIENT COMPONENT 
+"use client"; 
 
 import { ReactNode } from "react";
 import Link from "next/link";

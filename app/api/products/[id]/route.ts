@@ -1,34 +1,83 @@
 // app/api/products/[id]/route.ts
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-// PATCH - Sửa sản phẩm (sửa kiểu params cho Next.js 16)
-export async function PATCH(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+const UpdateSchema = z.object({
+  name: z.string().min(2).optional(),
+  description: z.string().nullable().optional(),
+  price: z.number().positive().optional(),
+  status: z.enum(["ACTIVE", "DRAFT"]).optional(),
+  categoryId: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+});
+
+/**
+ * GET /api/products/:id
+ */
+export async function GET(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ← Await params vì là Promise
-  const data = await request.json();
+  try {
+    const { id } = await ctx.params;
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: { category: true },
+    });
 
-  const product = await prisma.product.update({
-    where: { id },
-    data,
-  });
+    if (!product)
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json(product);
+    return NextResponse.json(product);
+  } catch (err) {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 }
 
-// DELETE - Soft delete (sửa kiểu params cho Next.js 16)
-export async function DELETE(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+/**
+ * PATCH /api/products/:id
+ */
+export async function PATCH(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ← Await params vì là Promise
+  try {
+    const { id } = await ctx.params;
+    const body = await req.json();
+    const parsed = UpdateSchema.parse(body);
 
-  await prisma.product.update({
-    where: { id },
-    data: { deletedAt: new Date() },
-  });
+    const updated = await prisma.product.update({
+      where: { id },
+      data: parsed,
+    });
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json(updated);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: err.issues }, { status: 422 });
+    }
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+/**
+ * DELETE (soft delete)
+ */
+export async function DELETE(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await ctx.params;
+
+    await prisma.product.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 }

@@ -7,47 +7,53 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @relation(fields: [roleId], references: [id])
-  roleId    String
-  orders    Order[]          
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Role {
   id    String  @id @default(cuid())
   name  String  @unique
   users User[]
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model Product {
-  id          String      @id @default(cuid())
-  name        String      @unique
+  id          String     @id @default(cuid())
+  name        String      
   description String?
   price       Float
-  category    String      // thêm field này
-  status      String      @default("DRAFT")  // "DRAFT" | "ACTIVE"
+  status      String     @default("DRAFT")
   imageUrl    String?
   deletedAt   DateTime?
-  orderItems  OrderItem[]
 
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  categoryId String?
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
-  @@index([category])
-  @@index([status])
-  @@index([deletedAt])
+  orderItems OrderItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 model Order {
   id        String    @id @default(cuid())
-  user      User      @relation(fields: [userId], references: [id])
   userId    String
+  user      User      @relation(fields: [userId], references: [id])
   total     Float
   status    String    @default("pending")
   orderItems OrderItem[]
@@ -57,10 +63,10 @@ model Order {
 
 model OrderItem {
   id        String   @id @default(cuid())
-  order     Order    @relation(fields: [orderId], references: [id])
   orderId   String
-  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
   productId String
-  quantity  Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
   price     Float
 }

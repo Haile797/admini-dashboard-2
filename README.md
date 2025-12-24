@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mini Admin Dashboard
 
-## Getting Started
+Mini Admin Dashboard is a full-stack admin system built with Next.js App Router.
+The project demonstrates authentication, role-based access control (RBAC),
+CRUD operations, dashboard analytics, and basic CI/CD.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Framework: Next.js 14 (App Router)
+- Language: TypeScript (strict)
+- UI: TailwindCSS, shadcn/ui
+- Auth: NextAuth (Credentials Provider, JWT)
+- Database: PostgreSQL (Neon)
+- ORM: Prisma
+- Charts: Recharts
+- Testing: Vitest (unit), Playwright (e2e)
+- CI/CD: GitHub Actions
+- Deployment: Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture Overview
 
-## Learn More
+- Uses Next.js App Router
+- Server Components for data fetching
+- Route Handlers for REST APIs
+- Prisma ORM for database access
+- JWT-based authentication
 
-To learn more about Next.js, take a look at the following resources:
+Browser  
+→ Next.js App Router  
+→ Route Handlers (/api)  
+→ Prisma ORM  
+→ PostgreSQL (Neon)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Authentication & RBAC
 
-## Deploy on Vercel
+Authentication is implemented using NextAuth Credentials Provider.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Roles
+- admin: Full access
+- staff: Read-only access
+- user: Public access
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### RBAC Enforcement
+RBAC is enforced at 3 layers:
+1. Login redirect based on role
+2. Middleware protecting /admin routes
+3. API layer authorization checks
+
+---
+
+## Features
+
+### Products
+- List products with pagination
+- Create / update / delete products (admin only)
+- Image upload
+- Soft delete
+
+### Orders
+- View order list and details
+- Update order status (admin only)
+
+### Dashboard
+- Monthly revenue
+- Order count
+- Order status statistics
+- Charts with Recharts
+
+---
+
+## API Documentation
+
+OpenAPI specification is available at:

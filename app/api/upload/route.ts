@@ -1,24 +1,22 @@
-// app/api/upload/route.ts
-import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 
-// Tắt body parser tự động của Next.js (bắt buộc cho upload file)
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export async function POST(req: Request) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get("file") as File;
 
-// Bắt buộc phải có dòng này để Next.js KHÔNG parse body → mới nhận được file
-export const POST = async (req: Request) => {
-  const form = await req.formData();
-  const file = form.get("file") as File;
-  
-  if (!file) {
-    return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: "Missing file" }, { status: 400 });
+    }
+
+    const blob = await put(file.name, file, {
+      access: "public",
+    });
+
+    return NextResponse.json({ url: blob.url });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
-
-  const { url } = await put(`products/${Date.now()}-${file.name}`, file, {
-    access: "public",
-  });
-
-  return NextResponse.json({ url });
-};
+}

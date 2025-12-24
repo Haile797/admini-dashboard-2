@@ -1,7 +1,6 @@
-"use client";
-import { ProductTable } from "@/components/admin/products/ProductTable";
-import { Button } from "@/components/ui/button";
+import ProductTable from "@/components/admin/products/ProductTable";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function ProductsPage() {
   return (
