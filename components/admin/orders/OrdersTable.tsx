@@ -36,6 +36,8 @@ type Pagination = {
   pages: number;
 };
 
+type QueryValue = string | number | null | undefined;
+
 export default function OrdersTable({
   initialItems,
   pagination,
@@ -51,7 +53,7 @@ export default function OrdersTable({
   const [q, setQ] = useState(searchParams.get("q") ?? "");
 
   // Helpers -------------------------------------------------
-  function updateURL(params: Record<string, any>) {
+  function updateURL(params: Record<string, QueryValue>) {
     const sp = new URLSearchParams(searchParams.toString());
 
     Object.entries(params).forEach(([key, value]) => {
@@ -80,7 +82,6 @@ export default function OrdersTable({
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex gap-4 items-center">
-        {/* Status Filter */}
         <select
           value={status}
           onChange={(e) => handleFilterStatus(e.target.value)}
@@ -92,7 +93,6 @@ export default function OrdersTable({
           <option value="cancelled">Đã huỷ</option>
         </select>
 
-        {/* Search */}
         <input
           type="text"
           placeholder="Tìm theo tên/email khách..."

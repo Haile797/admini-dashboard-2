@@ -1,4 +1,3 @@
-// app/api/products/[id]/route.ts
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -12,32 +11,28 @@ const UpdateSchema = z.object({
   imageUrl: z.string().nullable().optional(),
 });
 
-/**
- * GET /api/products/:id
- */
 export async function GET(
-  req: Request,
+  _req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await ctx.params;
+
     const product = await prisma.product.findUnique({
       where: { id },
       include: { category: true },
     });
 
-    if (!product)
+    if (!product) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
     return NextResponse.json(product);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
-/**
- * PATCH /api/products/:id
- */
 export async function PATCH(
   req: Request,
   ctx: { params: Promise<{ id: string }> }
@@ -53,19 +48,17 @@ export async function PATCH(
     });
 
     return NextResponse.json(updated);
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues }, { status: 422 });
     }
+
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
-/**
- * DELETE (soft delete)
- */
 export async function DELETE(
-  req: Request,
+  _req: Request,
   ctx: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -77,7 +70,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

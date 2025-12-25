@@ -1,6 +1,7 @@
 import OrdersTable from "@/components/admin/orders/OrdersTable";
 import { prisma } from "@/lib/prisma";
 import { parseISO } from "date-fns";
+import type { Prisma } from "@prisma/client";
 
 type SearchParams = {
   page?: string;
@@ -18,21 +19,18 @@ export default async function OrdersPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  // 🔥 FIX QUAN TRỌNG: searchParams là Promise → phải await
   const params = await searchParams;
 
   const page = Number(params.page ?? 1);
   const limit = Number(params.limit ?? 10);
   const skip = (page - 1) * limit;
 
-  const where: any = {};
+  const where: Prisma.OrderWhereInput = {};
 
-  // Lọc theo trạng thái
   if (params.status) {
     where.status = params.status.toLowerCase();
   }
 
-  // Lọc ngày
   if (params.dateFrom || params.dateTo) {
     where.createdAt = {};
     if (params.dateFrom) {
@@ -45,7 +43,6 @@ export default async function OrdersPage({
     }
   }
 
-  // Tìm kiếm tên hoặc email user
   if (params.q) {
     where.user = {
       OR: [
@@ -55,7 +52,6 @@ export default async function OrdersPage({
     };
   }
 
-  // Query danh sách order
   const [rawItems, total] = await Promise.all([
     prisma.order.findMany({
       where,
@@ -74,7 +70,6 @@ export default async function OrdersPage({
     prisma.order.count({ where }),
   ]);
 
-  // Convert Date → string (cho client component)
   const items = rawItems.map((o) => ({
     ...o,
     createdAt: o.createdAt.toISOString(),
@@ -90,7 +85,6 @@ export default async function OrdersPage({
   return (
     <div className="p-8 space-y-8">
       <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
-
       <OrdersTable initialItems={items} pagination={pagination} />
     </div>
   );

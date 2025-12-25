@@ -1,4 +1,3 @@
-// app/api/orders/[id]/route.ts
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -7,9 +6,12 @@ const ParamsSchema = z.object({
   id: z.string().min(1),
 });
 
-export async function GET(req: Request, { params }: { params: { id: string } | Promise<{ id: string }> }) {
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = typeof params === "object" ? (await params) : params;
+    const { id } = await params;
     ParamsSchema.parse({ id });
 
     const order = await prisma.order.findUnique({
@@ -32,11 +34,14 @@ export async function GET(req: Request, { params }: { params: { id: string } | P
       },
     });
 
-    if (!order) return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    if (!order) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
 
     return NextResponse.json(order);
-  } catch (err: any) {
-    console.error("GET /api/orders/[id] error:", err);
-    return NextResponse.json({ message: err?.message || "Server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

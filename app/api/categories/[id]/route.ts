@@ -12,7 +12,6 @@ export async function PATCH(
 ) {
   try {
     const { id } = await props.params;
-
     const body = await req.json();
     const parsed = UpdateCategorySchema.parse(body);
 
@@ -22,7 +21,7 @@ export async function PATCH(
     });
 
     return NextResponse.json(updated);
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues }, { status: 422 });
     }
@@ -35,13 +34,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: Request,
+  _req: Request,
   props: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await props.params;
 
-    // Kiểm tra xem danh mục có sản phẩm không
     const hasProducts = await prisma.product.count({
       where: { categoryId: id },
     });
@@ -54,9 +52,8 @@ export async function DELETE(
     }
 
     await prisma.category.delete({ where: { id } });
-
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Xóa thất bại" }, { status: 500 });
   }
 }

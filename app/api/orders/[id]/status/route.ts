@@ -5,11 +5,8 @@ export async function PATCH(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  // 🔥 FIX: params là Promise → phải await
   const { id } = await context.params;
-
-  const body = await req.json();
-  const { status } = body;
+  const { status } = await req.json();
 
   if (!["pending", "completed", "cancelled"].includes(status)) {
     return NextResponse.json(
@@ -25,7 +22,7 @@ export async function PATCH(
     });
 
     return NextResponse.json(updated);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Không thể cập nhật trạng thái" },
       { status: 500 }
