@@ -91,6 +91,7 @@ export default function ProductForm({
       <div>
         <label className="block mb-1 font-medium">Tên sản phẩm</label>
         <input
+          data-testid="product-name"
           className="w-full border rounded px-3 py-2"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -111,6 +112,7 @@ export default function ProductForm({
       <div>
         <label className="block mb-1 font-medium">Giá (VND)</label>
         <input
+          data-testid="product-price"
           type="number"
           className="w-full border rounded px-3 py-2"
           value={price}
@@ -122,6 +124,7 @@ export default function ProductForm({
       <div>
         <label className="block mb-1 font-medium">Trạng thái</label>
         <select
+           data-testid="product-status"
           className="w-full border rounded px-3 py-2"
           value={status}
           onChange={(e) => setStatus(e.target.value as "ACTIVE" | "DRAFT")}
@@ -135,6 +138,7 @@ export default function ProductForm({
       <div>
         <label className="block mb-1 font-medium">Danh mục</label>
         <select
+          data-testid="product-category"
           className="w-full border rounded px-3 py-2"
           value={categoryId ?? ""}
           onChange={(e) => setCategoryId(e.target.value)}
@@ -172,8 +176,10 @@ export default function ProductForm({
       </div>
 
       {/* Submit */}
-      <button className="px-4 py-2 bg-blue-600 text-white rounded">
-        {product ? "Lưu thay đổi" : "Tạo sản phẩm"}
+      <button
+         data-testid="product-submit"
+         className="px-4 py-2 bg-blue-600 text-white rounded">
+         {product ? "Lưu thay đổi" : "Tạo sản phẩm"}
       </button>
     </form>
   );

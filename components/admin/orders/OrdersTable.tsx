@@ -120,7 +120,7 @@ export default function OrdersTable({
 
           <TableBody>
             {initialItems.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow key={order.id} data-testid="order-row">
                 <TableCell className="font-medium">{order.id}</TableCell>
 
                 <TableCell>
