@@ -7,10 +7,20 @@ import bcrypt from "bcrypt";
 
 import { prisma } from "@/lib/prisma";
 
+/* ================== TYPES ================== */
+type AuthUser = {
+  id: string;
+  email: string;
+  name?: string | null;
+  roleId: string;
+  role: string;
+};
+
 /* ================== NEXT AUTH ================== */
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -18,6 +28,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
@@ -35,24 +46,30 @@ export const authOptions: NextAuthOptions = {
 
         if (!isValid) return null;
 
-        return {
+        const authUser: AuthUser = {
           id: user.id,
           email: user.email,
           name: user.name,
           roleId: user.roleId,
           role: user.role.name,
         };
+
+        return authUser;
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.roleId = (user as any).roleId;
-        token.role = (user as any).role;
+        const u = user as AuthUser;
+
+        token.roleId = u.roleId;
+        token.role = u.role;
       }
       return token;
     },
+
     async session({ session, token }) {
       if (session.user) {
         session.user.roleId = token.roleId as string;
@@ -61,6 +78,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+
   pages: {
     signIn: "/auth/login",
   },
