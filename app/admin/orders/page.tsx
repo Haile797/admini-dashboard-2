@@ -25,7 +25,7 @@ export default async function OrdersPage({
   const limit = Number(params.limit ?? 10);
   const skip = (page - 1) * limit;
 
-  const where: Prisma.OrderWhereInput = {};
+  const where = {} as Prisma.OrderWhereInput;
 
   if (params.status) {
     where.status = params.status.toLowerCase();
@@ -70,7 +70,7 @@ export default async function OrdersPage({
     prisma.order.count({ where }),
   ]);
 
-  const items = rawItems.map((o) => ({
+  const items = rawItems.map((o: typeof rawItems[number]) => ({
     ...o,
     createdAt: o.createdAt.toISOString(),
   }));

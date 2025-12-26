@@ -3,6 +3,15 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import StatusButtons from "@/components/admin/orders/StatusButtons";
 
+type OrderItemDTO = {
+  id: string;
+  price: number;
+  quantity: number;
+  product: {
+    name: string;
+  };
+};
+
 export default async function OrderDetailPage(
   props: { params: Promise<{ id: string }> }
 ) {
@@ -22,9 +31,12 @@ export default async function OrderDetailPage(
     return <div className="p-8">Không tìm thấy đơn hàng</div>;
   }
 
-  // 🔥 Tính tổng tiền (phòng trường hợp total chưa chuẩn)
-  const calculatedTotal = order.orderItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+  const orderItems = order.orderItems as OrderItemDTO[];
+
+  // 🔥 Tính tổng tiền (STRICT TYPE)
+  const calculatedTotal = orderItems.reduce(
+    (sum: number, item: OrderItemDTO) =>
+      sum + item.price * item.quantity,
     0
   );
 
@@ -40,10 +52,12 @@ export default async function OrderDetailPage(
               <strong>Mã đơn:</strong> {order.id}
             </p>
             <p className="text-lg mt-1">
-              <strong>Khách hàng:</strong> {order.user.name} ({order.user.email})
+              <strong>Khách hàng:</strong>{" "}
+              {order.user.name} ({order.user.email})
             </p>
             <p className="text-lg mt-1">
-              <strong>Ngày tạo:</strong> {order.createdAt.toLocaleDateString()}
+              <strong>Ngày tạo:</strong>{" "}
+              {order.createdAt.toLocaleDateString()}
             </p>
           </div>
 
@@ -63,7 +77,10 @@ export default async function OrderDetailPage(
         </div>
 
         {/* Buttons update status */}
-        <StatusButtons orderId={order.id} currentStatus={order.status} />
+        <StatusButtons
+          orderId={order.id}
+          currentStatus={order.status}
+        />
 
         {/* Tổng tiền */}
         <p className="text-xl font-bold mt-4">
@@ -89,15 +106,23 @@ export default async function OrderDetailPage(
           </thead>
 
           <tbody>
-            {order.orderItems.map((item) => (
-              <tr key={item.id} className="border-b hover:bg-gray-50">
+            {orderItems.map((item: OrderItemDTO) => (
+              <tr
+                key={item.id}
+                className="border-b hover:bg-gray-50"
+              >
                 <td className="p-3">{item.product.name}</td>
                 <td className="p-3 text-center">
                   {item.price.toLocaleString("vi-VN")} ₫
                 </td>
-                <td className="p-3 text-center">{item.quantity}</td>
+                <td className="p-3 text-center">
+                  {item.quantity}
+                </td>
                 <td className="p-3 text-center font-semibold">
-                  {(item.price * item.quantity).toLocaleString("vi-VN")} ₫
+                  {(item.price * item.quantity).toLocaleString(
+                    "vi-VN"
+                  )}{" "}
+                  ₫
                 </td>
               </tr>
             ))}

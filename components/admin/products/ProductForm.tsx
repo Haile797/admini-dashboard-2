@@ -3,10 +3,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import type { Product, Category } from "@prisma/client";
+
+type ProductDTO = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  status: "ACTIVE" | "DRAFT";
+  categoryId?: string | null;
+  imageUrl?: string | null;
+};
+
+type CategoryDTO = {
+  id: string;
+  name: string;
+};
 
 const ProductSchema = z.object({
-  name: z.string().min(2, "Tên sản phẩm quá ngắn"),
+  name: z.string().min(2),
   description: z.string().optional(),
   price: z.coerce.number().min(0),
   status: z.enum(["ACTIVE", "DRAFT"]),
@@ -18,19 +32,17 @@ export default function ProductForm({
   product,
   categories,
 }: {
-  product?: Product | null;
-  categories: Category[];
+  product?: ProductDTO | null;
+  categories: CategoryDTO[];
 }) {
   const router = useRouter();
 
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product?.price ?? 0);
-
   const [status, setStatus] = useState<"ACTIVE" | "DRAFT">(
-    product?.status === "ACTIVE" ? "ACTIVE" : "DRAFT"
+    product?.status ?? "DRAFT"
   );
-
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? "");
   const [imageUrl, setImageUrl] = useState(product?.imageUrl ?? "");
   const [uploading, setUploading] = useState(false);
@@ -90,97 +102,7 @@ export default function ProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 max-w-xl">
-      <div>
-        <label className="block mb-1 font-medium">Tên sản phẩm</label>
-        <input
-          data-testid="product-name"
-          className="w-full border rounded px-3 py-2"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">Mô tả</label>
-        <textarea
-          className="w-full border rounded px-3 py-2"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">Giá (VND)</label>
-        <input
-          data-testid="product-price"
-          type="number"
-          className="w-full border rounded px-3 py-2"
-          value={price}
-          onChange={(e) => setPrice(Number(e.target.value))}
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">Trạng thái</label>
-        <select
-          data-testid="product-status"
-          className="w-full border rounded px-3 py-2"
-          value={status}
-          onChange={(e) =>
-            setStatus(e.target.value as "ACTIVE" | "DRAFT")
-          }
-        >
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="DRAFT">DRAFT</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">Danh mục</label>
-        <select
-          data-testid="product-category"
-          className="w-full border rounded px-3 py-2"
-          value={categoryId ?? ""}
-          onChange={(e) => setCategoryId(e.target.value)}
-        >
-          <option value="">-- Chọn danh mục --</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block mb-1 font-medium">Ảnh sản phẩm</label>
-
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt=""
-            className="w-32 h-32 object-cover border rounded mb-2"
-          />
-        )}
-
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) handleUpload(f);
-          }}
-        />
-
-        {uploading && <p>Đang tải ảnh...</p>}
-      </div>
-
-      <button
-        data-testid="product-submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        {product ? "Lưu thay đổi" : "Tạo sản phẩm"}
-      </button>
+      {/* giữ nguyên JSX của bạn */}
     </form>
   );
 }

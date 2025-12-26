@@ -13,9 +13,9 @@ export async function GET(req: Request) {
     status: url.searchParams.get("status"),
   });
 
-  const where: Prisma.ProductWhereInput = {
+  const where = {
     deletedAt: null,
-  };
+  } as Prisma.ProductWhereInput;
 
   if (parsed.status) {
     where.status = parsed.status;

@@ -10,16 +10,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import type { Product, Category } from "@prisma/client";
 
-type ProductWithCategory = Product & {
-  category: Category | null;
+type ProductDTO = {
+  id: string;
+  name: string;
+  price: number;
+  status: string;
+  category?: {
+    name: string;
+  } | null;
 };
 
 export default function ProductTable({
   products,
 }: {
-  products: ProductWithCategory[];
+  products: ProductDTO[];
 }) {
   return (
     <div className="rounded border bg-card">
@@ -36,18 +41,12 @@ export default function ProductTable({
 
         <TableBody>
           {products.map((p) => (
-            <TableRow key={p.id} data-testid="product-row">
+            <TableRow key={p.id}>
               <TableCell className="font-medium">{p.name}</TableCell>
-
               <TableCell>{p.category?.name ?? "-"}</TableCell>
-
-              <TableCell>
-                {p.price.toLocaleString("vi-VN")} ₫
-              </TableCell>
-
+              <TableCell>{p.price.toLocaleString("vi-VN")} ₫</TableCell>
               <TableCell>{p.status}</TableCell>
-
-              <TableCell className="text-right space-x-2">
+              <TableCell className="text-right">
                 <Button size="sm" variant="outline" asChild>
                   <Link href={`/admin/products/${p.id}/edit`}>Sửa</Link>
                 </Button>
