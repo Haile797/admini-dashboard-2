@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import StatsCards from "@/components/admin/dashboard/StatsCards";
 import RevenueChart from "@/components/admin/dashboard/RevenueChart";
 
-export const revalidate = 0; // dev: no cache
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const now = new Date();
